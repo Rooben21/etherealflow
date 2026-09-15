@@ -1,0 +1,48 @@
+{
+  "name": "StudioAsset",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "file_uri": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "rights_confirmed": {
+      "type": "boolean"
+    },
+    "source_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "file_uri",
+    "rights_confirmed"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

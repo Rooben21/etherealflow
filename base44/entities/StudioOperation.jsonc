@@ -1,0 +1,53 @@
+{
+  "name": "StudioOperation",
+  "type": "object",
+  "properties": {
+    "video_id": {
+      "type": "string"
+    },
+    "stage": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "credits_estimate": {
+      "type": "number"
+    },
+    "cost_type": {
+      "type": "string",
+      "default": "estimate"
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "video_id",
+    "stage",
+    "status",
+    "credits_estimate"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

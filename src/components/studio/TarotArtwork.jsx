@@ -1,0 +1,5 @@
+import React from 'react';
+import { Moon, Sparkles, Sun, Star } from 'lucide-react';
+export default function TarotArtwork() {
+ return <div className="tarot-art" aria-hidden="true"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><Star className="absolute left-5 top-8 text-violet-300/50" size={12}/><Sparkles className="absolute right-8 bottom-7 text-violet-200/60" size={20}/><div className="tarot-card tarot-left"><Sun size={47}/><span>THE SUN</span></div><div className="tarot-card tarot-right"><Star size={44}/><span>THE STAR</span></div><div className="tarot-card tarot-main"><span className="text-[9px] tracking-[.3em]">XVIII</span><div className="moon-ring"><Moon size={54} strokeWidth={1}/></div><span>THE MOON</span><div className="flex gap-2"><Star size={7}/><Star size={9}/><Star size={7}/></div></div></div>;
+}

@@ -1,0 +1,51 @@
+{
+  "name": "StudioSettings",
+  "type": "object",
+  "properties": {
+    "generation_paused": {
+      "type": "boolean",
+      "default": false
+    },
+    "publication_paused": {
+      "type": "boolean",
+      "default": true
+    },
+    "daily_credit_limit": {
+      "type": "number",
+      "default": 100
+    },
+    "monthly_credit_limit": {
+      "type": "number",
+      "default": 1000
+    },
+    "operation_lock": {
+      "type": "string",
+      "default": ""
+    },
+    "lock_started_at": {
+      "type": "string"
+    }
+  },
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
