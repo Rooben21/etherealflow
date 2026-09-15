@@ -40,6 +40,58 @@
     },
     "message": {
       "type": "string"
+    },
+    "settings_snapshot": {
+      "type": "object"
+    },
+    "title_snapshot": {
+      "type": "string"
+    },
+    "dispatch_token": {
+      "type": "string",
+      "default": ""
+    },
+    "dispatch_date": {
+      "type": "string"
+    },
+    "send_started_at": {
+      "type": "string"
+    },
+    "accepted_at": {
+      "type": "string"
+    },
+    "published_confirmed_at": {
+      "type": "string"
+    },
+    "last_checked_at": {
+      "type": "string"
+    },
+    "next_attempt_at": {
+      "type": "string"
+    },
+    "attempt_count": {
+      "type": "number",
+      "default": 0
+    },
+    "worker_token": {
+      "type": "string",
+      "default": ""
+    },
+    "worker_until": {
+      "type": "string",
+      "default": ""
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "baseline_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

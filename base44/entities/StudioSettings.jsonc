@@ -24,6 +24,15 @@
     },
     "lock_started_at": {
       "type": "string"
+    },
+    "postiz_accounts": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "postiz_accounts_checked_at": {
+      "type": "string"
     }
   },
   "rls": {
@@ -47,5 +56,6 @@
         "role": "admin"
       }
     }
-  }
+  },
+  "required": []
 }
