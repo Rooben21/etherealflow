@@ -1,0 +1,10 @@
+import React,{useState} from 'react';
+import {useQuery,useQueryClient} from '@tanstack/react-query';
+import {base44} from '@/api/base44Client';
+const labels={uploading:'Передача MP4',sending:'Надсилання запиту',accepted:'Прийнято Postiz',QUEUE:'У черзі Postiz',DRAFT:'Чернетка в Postiz',PUBLISHED:'Опубліковано за даними Postiz',ERROR:'Помилка у Postiz',uncertain:'Результат невідомий',failed:'Передача не завершена'};
+export default function PublicationHistory({videoId}){
+ const qc=useQueryClient();const [busy,setBusy]=useState('');const [error,setError]=useState('');
+ const {data:rows=[],isLoading}=useQuery({queryKey:['studio-publications',videoId],queryFn:()=>base44.entities.StudioPublication.filter({video_id:videoId},'-created_date',100),enabled:!!videoId});
+ const check=async id=>{setBusy(id);setError('');try{const {data}=await base44.functions.invoke('studioPublish',{action:'check',publicationId:id});if(data.error)throw new Error(data.error);await qc.invalidateQueries({queryKey:['studio-publications']});}catch(e){setError(e.response?.data?.error||e.message);}finally{setBusy('');}};
+ return <div className="space-y-3"><h3 className="text-sm font-semibold">Передачі у Postiz</h3>{error&&<p role="alert" className="text-xs text-destructive">{error}</p>}{isLoading?<p className="text-xs text-muted-foreground">Завантаження…</p>:rows.length?rows.map(r=><div key={r.id} className="border-t border-border pt-3 space-y-2"><p className="text-xs">{r.account_name} · {labels[r.state]||r.state}</p>{r.scheduled_at&&<p className="text-[10px] text-muted-foreground">{new Date(r.scheduled_at).toLocaleString('uk-UA')}</p>}<p className="text-[10px] text-muted-foreground">{r.message}</p>{r.post_id&&<button className="studio-button w-full" disabled={!!busy} onClick={()=>check(r.id)}>{busy===r.id?'Перевірка…':'Перевірити статус у Postiz'}</button>}{r.published_url?.startsWith('https://')&&<a className="text-xs text-primary block" href={r.published_url} target="_blank" rel="noreferrer">Відкрити публікацію</a>}</div>):<p className="text-xs text-muted-foreground">Це відео ще не передавалося у Postiz.</p>}</div>;
+}

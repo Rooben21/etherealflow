@@ -1,0 +1,59 @@
+{
+  "name": "StudioRender",
+  "type": "object",
+  "properties": {
+    "video_id": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "provider_id": {
+      "type": "string"
+    },
+    "result_url": {
+      "type": "string"
+    },
+    "file_uri": {
+      "type": "string"
+    },
+    "audio_url": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "number"
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "video_id",
+    "state"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

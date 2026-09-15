@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Film, ArrowUpRight, Plus } from 'lucide-react';
 import { Image } from '@/components/ui/image';
-export const statusLabels = {draft:'Чернетка',script_ready:'Сценарій готовий',audio_ready:'Озвучка готова',visual_ready:'Візуал готовий',ready:'Готове до перегляду',approved:'Погоджено',error:'Потрібна увага',running:'Створення…'};
+export const statusLabels = {draft:'Чернетка',script_ready:'Сценарій готовий',audio_ready:'Озвучка готова',visual_ready:'Візуал готовий',ready:'Готове до перегляду',approved:'Погоджено',error:'Потрібна увага',running:'Створення…',render_pending:'Монтаж у Creatomate'};
 export default function VideoList({videos=[],loading=false}) {
  if(loading) return <div className="panel p-12 text-center text-muted-foreground">Завантаження бібліотеки…</div>;
  if(!videos.length) return <div className="panel flex flex-col items-center justify-center min-h-[235px] p-6 text-center"><span className="empty-icon"><Film size={25} strokeWidth={1.3}/></span><h3 className="mt-4 text-sm font-medium">Тут почнеться ваша історія</h3><p className="text-xs text-muted-foreground mt-2 max-w-sm leading-relaxed">Створіть перший сценарій. Усі матеріали та етапи роботи збережуться в бібліотеці.</p><Link to="/studio" className="text-violet-300 text-xs inline-flex gap-2 items-center mt-5"><Plus size={14}/>Створити перший матеріал</Link></div>;

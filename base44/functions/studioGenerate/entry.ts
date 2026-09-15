@@ -1,6 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { takeStudioLock } from '../../shared/studioProviders.ts';
 export default async function(req) {
-  let client, settings, job, operation, locked = false;
+  let client, settings, job, operation, lock, locked = false;
   try {
     client = createClientFromRequest(req);
     const user = await client.auth.me();
@@ -13,15 +14,11 @@ export default async function(req) {
     if (stage !== 'script' && !job.script) throw new Error('Спочатку створіть і збережіть сценарій.');
     if ((job.script || '').length > 2500) throw new Error('Сценарій має містити не більше 2500 символів.');
     if (!['uk','ru','en','fr','es','pl','de'].includes(job.language)) throw new Error('Оберіть мову зі списку.');
-    settings = (await client.entities.StudioSettings.list('created_date',1))[0];
-    if (!settings) throw new Error('Відсутні налаштування студії.');
-    if (settings.generation_paused) throw new Error('Генерацію призупинено. Відновіть її на дашборді.');
-    if (settings.operation_lock) throw new Error('Інша операція ще виконується або має невідомий результат. Перевірте журнал витрат перед повтором.');
-    const token = crypto.randomUUID();
-    await client.entities.StudioSettings.updateMany({id:settings.id,operation_lock:''},{$set:{operation_lock:token,lock_started_at:new Date().toISOString()}});
-    const current = await client.entities.StudioSettings.get(settings.id);
-    if (current.operation_lock !== token) throw new Error('Інша операція вже виконується. Спробуйте після її завершення.');
+    if (job.status === 'render_pending') throw new Error('Перевірте завершення монтажу перед створенням нових компонентів.');
+    lock = await takeStudioLock(client);
+    settings = lock.settings;
     locked = true;
+    if (settings.generation_paused) throw new Error('Генерацію призупинено. Відновіть її на дашборді.');
     const estimate = stage === 'audio' ? Math.ceil(job.script.length/50) : 1;
     const now = new Date();
     const monthStart = new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),1)).toISOString();
@@ -60,6 +57,6 @@ export default async function(req) {
     if(job && locked) await client.entities.StudioVideo.update(job.id,{status:'error',last_error:message});
     return Response.json({error:message},{status:400});
   } finally {
-    if(locked && settings && client) await client.entities.StudioSettings.update(settings.id,{operation_lock:''});
+    if(lock) await lock.release();
   }
 }

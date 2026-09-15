@@ -1,0 +1,72 @@
+{
+  "name": "StudioPublication",
+  "type": "object",
+  "properties": {
+    "video_id": {
+      "type": "string"
+    },
+    "video_uri": {
+      "type": "string"
+    },
+    "account_id": {
+      "type": "string"
+    },
+    "account_name": {
+      "type": "string"
+    },
+    "platform": {
+      "type": "string"
+    },
+    "mode": {
+      "type": "string"
+    },
+    "scheduled_at": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "post_id": {
+      "type": "string"
+    },
+    "published_url": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "media": {
+      "type": "object"
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "video_id",
+    "account_id",
+    "state"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
