@@ -1,11 +1,12 @@
-import React,{useState,useEffect} from 'react';
+import React,{useEffect} from 'react';
 import {useQuery,useQueryClient} from '@tanstack/react-query';
 import {base44} from '@/api/base44Client';
 import PublicationQueueItem from '@/components/studio/PublicationQueueItem';
+import usePublicationActions from '@/components/studio/usePublicationActions';
 export default function PublicationHistory({videoId,all=false}){
- const qc=useQueryClient();const [busy,setBusy]=useState('');const [error,setError]=useState('');const [links,setLinks]=useState({});
+ const qc=useQueryClient();const {busy,error,links,action}=usePublicationActions();
  const {data:rows=[],isLoading,error:loadError}=useQuery({queryKey:['studio-publications',all?'all':videoId],queryFn:()=>all?base44.entities.StudioPublication.list('-created_date',100):base44.entities.StudioPublication.filter({video_id:videoId},'-created_date',100),enabled:all||!!videoId,refetchInterval:15000});
  useEffect(()=>base44.entities.StudioPublication.subscribe(()=>qc.invalidateQueries({queryKey:['studio-publications']})),[qc]);
- const action=async(item,name,extra)=>{setBusy(item.id);setError('');try{const {data}=await base44.functions.invoke(name==='media'?'studioAssetAccess':'studioPublish',name==='media'?{id:item.id,kind:'publication'}:{action:name,publicationId:item.id,...extra});if(data.error)throw new Error(data.error);if(name==='media')setLinks(v=>({...v,[item.id]:data.url}));await qc.invalidateQueries({queryKey:['studio-publications']});}catch(e){setError(e.response?.data?.error||e.message);}finally{setBusy('');}};
+
  return <section className={all?'panel p-5 space-y-3':'space-y-3'}><h3 className="text-sm font-semibold">{all?'Плани та черга публікацій':'Черга та передачі у Postiz'}</h3>{all&&<p className="text-xs text-muted-foreground">Останні 100 планів · Час: {Intl.DateTimeFormat().resolvedOptions().timeZone} · Плани зберігаються навіть коли Postiz вимкнений.</p>}{(error||loadError)&&<p role="alert" className="text-xs text-destructive">{error||'Не вдалося завантажити чергу.'}</p>}{isLoading?<p className="text-xs text-muted-foreground">Завантаження…</p>:rows.length?rows.map(r=><React.Fragment key={r.id}><PublicationQueueItem item={r} busy={!!busy} showVideo={all} onAction={(name,extra)=>action(r,name,extra)}/>{links[r.id]&&<a href={links[r.id]} target="_blank" rel="noreferrer" className="studio-button w-full">Переглянути збережений MP4</a>}</React.Fragment>):<p className="text-xs text-muted-foreground">Збережених планів ще немає.</p>}</section>;
 }

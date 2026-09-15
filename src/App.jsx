@@ -14,6 +14,7 @@ import Studio from '@/pages/Studio';
 import Library from '@/pages/Library';
 import Integrations from '@/pages/Integrations';
 import Accounts from '@/pages/Accounts';
+import PublicationCalendar from '@/pages/PublicationCalendar';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
             <Route path="/library" element={<Library />} />
             <Route path="/integrations" element={<Integrations />} />
             <Route path="/accounts" element={<Accounts />} />
+            <Route path="/calendar" element={<PublicationCalendar />} />
           </Route>
         </Route>
       </Route>
