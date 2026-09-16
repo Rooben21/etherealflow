@@ -17,7 +17,7 @@ export default async function(req){
   const open=(await client.entities.CampaignStep.filter({campaign_id:c.id,state:{$in:['reserved','calling','uncertain','result']}},'-created_date',1))[0];
   if(open){if(open.state==='result'){await applyCampaignStep(client,c,open);return Response.json({ok:true,recovered:true});}await client.entities.ContentCampaign.update(c.id,{status:'needs_attention',message:'Незавершений платний запит. Автоматичний повтор заблоковано; відновіть крок.'});return Response.json({ok:true,needsAttention:true});}
   if(c.strategy?.summary){validateStrategy(c.strategy);if(await seedCampaign(client,c))return Response.json({ok:true,seeded:true});}
-  const items=await allCampaignItems(client,c.id),pending=items.filter(i=>i.state==='pending'&&!i.manual_edit&&!i.video_id).slice(0,2);
+  const items=await allCampaignItems(client,c.id),pending=items.filter(i=>i.state==='pending'&&!i.manual_edit&&!i.video_id&&(!c.regenerate_item_id||i.id===c.regenerate_item_id)).slice(0,2);
   if(c.strategy?.summary&&!pending.length){await client.entities.ContentCampaign.updateMany({id:c.id,status:'running'},{$set:{status:'completed',ready_count:items.filter(i=>i.state==='ready').length,message:'План і сценарії готові. Виробництво та публікація не запускалися.'}});return Response.json({ok:true,completed:true});}
   const settings=(await client.entities.StudioSettings.list('created_date',1))[0];if(!settings)throw new Error('Налаштування студії відсутні. Відкрийте інтеграції.');
   if(settings.operation_lock){await client.entities.ContentCampaign.update(c.id,{message:'Очікує завершення іншої операції студії. Якщо вона зависла, потрібне відновлення.'});return Response.json({ok:true,waiting:true});}

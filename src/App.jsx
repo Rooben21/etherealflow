@@ -15,6 +15,7 @@ import Library from '@/pages/Library';
 import Integrations from '@/pages/Integrations';
 import Accounts from '@/pages/Accounts';
 import PublicationCalendar from '@/pages/PublicationCalendar';
+import ContentCampaigns from '@/pages/ContentCampaigns';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -59,6 +60,7 @@ const AuthenticatedApp = () => {
             <Route path="/integrations" element={<Integrations />} />
             <Route path="/accounts" element={<Accounts />} />
             <Route path="/calendar" element={<PublicationCalendar />} />
+            <Route path="/campaigns" element={<ContentCampaigns />} />
           </Route>
         </Route>
       </Route>

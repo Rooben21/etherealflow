@@ -9,8 +9,9 @@ export default function useCalendarPublications(month){
  const query=useQuery({queryKey:['studio-publications','calendar',from,until],queryFn:async()=>{
   const rows=[];let page;
   do{page=await base44.entities.StudioPublication.filter({scheduled_at:{$gte:from,$lte:until}},'scheduled_at',100,rows.length);rows.push(...page);}while(page.length===100);
-  return rows;
+  const campaignRows=[];let batch;do{batch=await base44.entities.CampaignItem.filter({scheduled_at:{$gte:from,$lte:until}},'scheduled_at',100,campaignRows.length);campaignRows.push(...batch);}while(batch.length===100);
+  return [...rows,...campaignRows.map(i=>({...i,_kind:'campaign',mode:'schedule',title_snapshot:i.content?.title||`Ролик ${i.sequence+1}`,account_name:i.rubric}))].sort((a,b)=>a.scheduled_at.localeCompare(b.scheduled_at));
  },refetchInterval:15000});
- useEffect(()=>base44.entities.StudioPublication.subscribe(()=>qc.invalidateQueries({queryKey:['studio-publications']})),[qc]);
+ useEffect(()=>{const refresh=()=>qc.invalidateQueries({queryKey:['studio-publications']});const a=base44.entities.StudioPublication.subscribe(refresh),b=base44.entities.CampaignItem.subscribe(refresh);return ()=>{a();b();};},[qc]);
  return query;
 }

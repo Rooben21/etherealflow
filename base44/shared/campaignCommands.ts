@@ -49,9 +49,10 @@ export async function changeCampaign(client,c,b){
  }
  if(b.action==='regenerate'){
   if(b.confirmed!==true||c.status==='stopped')throw new Error('Підтвердіть нову платну генерацію; зупинену кампанію не можна відновити.');
+  if(c.regenerate_item_id)throw new Error('Дочекайтеся завершення вже вибраної перегенерації.');
   const open=await client.entities.CampaignStep.filter({campaign_id:c.id,state:{$in:['reserved','calling','uncertain','result']}},'-created_date',1);if(open.length)throw new Error('Спочатку відновіть незавершений крок.');
   await client.entities.CampaignItem.update(item.id,{state:'pending',previous_content:item.content||{},manual_edit:false,revision:item.revision+1,message:'Перегенерацію лише цього сценарію поставлено в чергу.'});
-  const rows=await allCampaignItems(client,c.id);await client.entities.ContentCampaign.update(c.id,{ready_count:rows.filter(i=>i.state==='ready').length,status:'running'});return {};
+  const rows=await allCampaignItems(client,c.id);await client.entities.ContentCampaign.update(c.id,{ready_count:rows.filter(i=>i.state==='ready').length,status:'running',regenerate_item_id:item.id,resume_status:c.status});return {};
  }
  throw new Error('Некоректна дія.');
 }

@@ -29,6 +29,13 @@
     "worker_started_at": {
       "type": "string"
     },
+    "regenerate_item_id": {
+      "type": "string",
+      "default": ""
+    },
+    "resume_status": {
+      "type": "string"
+    },
     "message": {
       "type": "string"
     }

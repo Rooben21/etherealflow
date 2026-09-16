@@ -26,5 +26,10 @@ export async function applyCampaignStep(client,c,step){
  await client.entities.CampaignStep.update(step.id,{state:'completed',message:'Результат застосовано без повторної генерації.'});
  const rows=await allCampaignItems(client,c.id),ready=rows.filter(i=>i.state==='ready').length;
  await client.entities.ContentCampaign.update(c.id,{ready_count:ready,message:step.kind==='strategy'?'Стратегію збережено. Наступний крок — календар і сценарії.':`Готово ${ready} із ${c.total_count} сценаріїв.`});
+ if(c.regenerate_item_id&&step.item_ids?.includes(c.regenerate_item_id)){
+  const resume=['running','paused','budget_paused','completed'].includes(c.resume_status)?c.resume_status:'paused';
+  await client.entities.ContentCampaign.updateMany({id:c.id,status:'running'},{$set:{status:resume==='completed'&&ready!==c.total_count?'paused':resume}});
+  await client.entities.ContentCampaign.update(c.id,{regenerate_item_id:'',resume_status:''});
+ }
  if(ready===c.total_count)await client.entities.ContentCampaign.updateMany({id:c.id,status:'running'},{$set:{status:'completed',message:'Усі сценарії готові. Автоматичне виробництво не запускалося.'}});
 }
