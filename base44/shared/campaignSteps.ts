@@ -20,7 +20,7 @@ export async function applyCampaignStep(client,c,step){
    const content=validateContent(value,c.config,item.sequence,true);if(duplicateContent(content,all,item.id))throw new Error('Виявлено повтор назви або вступу; інші сценарії не змінено.');
    item.content=content;changes.push({id:item.id,content,state:'ready',message:'Сценарій збережено; виробництво ще не запускалося.',revision:(item.revision||0)+1});
   }
-  if(changes.length)await client.entities.CampaignItem.bulkUpdate(changes);
+  if(changes.length){await client.entities.CampaignItem.bulkUpdate(changes);for(const change of changes){const stored=await client.entities.CampaignItem.get(change.id);if(stored.state!=='ready'||stored.content?.script!==change.content.script)throw new Error('Не всі результати збережено. Відновіть крок із записаної відповіді без повторної генерації.');}}
  }
  if(step.operation_id)await client.entities.StudioOperation.update(step.operation_id,{status:'completed',message:'Результат збережено. Оцінка кредитів, не фактичний рахунок.'});
  await client.entities.CampaignStep.update(step.id,{state:'completed',message:'Результат застосовано без повторної генерації.'});

@@ -25,11 +25,11 @@ export async function connectedAccounts() {
   if (!Array.isArray(rows)) throw new Error('Postiz: нерозпізнаний формат списку акаунтів.');
   return rows.slice(0,200).map(r=>({id:r.id,name:r.name||r.profile||r.identifier,platform:r.identifier,disabled:!!r.disabled,profile:r.profile||''}));
 }
-export async function takeStudioLock(client) {
+export async function takeStudioLock(client, ownerToken) {
   const settings = (await client.entities.StudioSettings.list('created_date',1))[0];
   if (!settings) throw new Error('Налаштування студії відсутні.');
   if (settings.operation_lock) throw new Error('Інша операція виконується або має невідомий результат.');
-  const token = crypto.randomUUID();
+  const token = ownerToken || crypto.randomUUID();
   await client.entities.StudioSettings.updateMany({id:settings.id,operation_lock:''},{$set:{operation_lock:token,lock_started_at:new Date().toISOString()}});
   if ((await client.entities.StudioSettings.get(settings.id)).operation_lock !== token) throw new Error('Інша операція вже виконується.');
   return {settings,token,release:()=>client.entities.StudioSettings.updateMany({id:settings.id,operation_lock:token},{$set:{operation_lock:''}})};

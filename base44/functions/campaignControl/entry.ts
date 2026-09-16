@@ -14,9 +14,9 @@ export default async function(req){
    if(c.status==='stopped')throw new Error('Кампанію вже зупинено.');
    await client.entities.ContentCampaign.updateMany({id:c.id,status:c.status},{$set:{status:body.action==='pause'?'paused':'stopped',message:body.action==='pause'?'На паузі. Уже розпочатий крок збереже результат.':'Зупинено. Збережені результати доступні; нових платних кроків не буде.'}});return Response.json({ok:true});
   }
-  if(c.status==='stopped'&&body.action==='recover')throw new Error('Зупинену кампанію не можна відновити.');
+  if(c.status==='stopped'&&body.action==='recover'&&body.retry===true)throw new Error('Для зупиненої кампанії можна лише зберегти результат і зняти блокування, без нової платної спроби.');
   claim=await lockCampaign(client,c.id,body.action==='recover');const current=await client.entities.ContentCampaign.get(c.id);
-  const result=body.action==='recover'?await recoverCampaign(client,current,body):await changeCampaign(client,current,body);
+  const result=body.action==='recover'?await recoverCampaign(client,current,{...body,previousWorkerToken:claim.item.worker_token}):await changeCampaign(client,current,body);
   return Response.json({ok:true,...result});
  }catch(error){return Response.json({error:error.message||'Не вдалося змінити кампанію.'},{status:400});}
  finally{if(claim)await claim.release();}
