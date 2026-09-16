@@ -20,12 +20,22 @@ export async function changeCampaign(client,c,b){
   if(!Number.isInteger(b.daily)||b.daily<1||b.daily>100000||!Number.isInteger(b.monthly)||b.monthly<1||b.monthly>1000000)throw new Error('Перевірте ліміти.');
   await client.entities.ContentCampaign.update(c.id,{config:{...c.config,daily_limit:b.daily,monthly_limit:b.monthly}});return {};
  }
+ if(b.action==='group'){
+  if(!['day','rubric'].includes(b.scope)||typeof b.source!=='string'||b.source.length>180||typeof b.newRubric!=='string'||b.newRubric.length>180)throw new Error('Оберіть день або рубрику.');
+  if(b.scope==='rubric'&&!b.newRubric.trim())throw new Error('Вкажіть нову назву рубрики.');
+  if(b.scope==='day'&&(!/^\d{4}-\d\d-\d\d$/.test(b.source)||!/^\d{4}-\d\d-\d\d$/.test(b.newDate)))throw new Error('Оберіть коректну дату.');
+  const rows=await allCampaignItems(client,c.id),selected=rows.filter(i=>b.scope==='day'?i.scheduled_local.slice(0,10)===b.source:i.rubric===b.source);
+  if(!selected.length||selected.some(i=>i.video_id))throw new Error('Немає роликів або частину вже передано до майстерні. Змініть їх окремо.');
+  const ids=new Set(selected.map(i=>i.id)),occupied=new Set(rows.filter(i=>!ids.has(i.id)).map(i=>i.scheduled_at));
+  const updates=selected.map(i=>{const local=b.scope==='day'?b.newDate+i.scheduled_local.slice(10):i.scheduled_local,instant=localInstant(local,c.config.timezone);if(occupied.has(instant))throw new Error('Новий час перетинається з іншим роликом кампанії.');occupied.add(instant);return {id:i.id,scheduled_local:local,scheduled_at:instant,rubric:b.newRubric.trim()||i.rubric,revision:(i.revision||0)+1};});
+  await client.entities.CampaignItem.bulkUpdate(updates);return {changed:updates.length};
+ }
  const item=typeof b.itemId==='string'?await client.entities.CampaignItem.get(b.itemId):null;
  if(!item||item.campaign_id!==c.id)throw new Error('Оберіть ролик цієї кампанії.');
  if(b.action==='export'){
   if(item.state!=='ready')throw new Error('Спочатку підготуйте сценарій.');
   let video=item.video_id?await client.entities.StudioVideo.get(item.video_id):(await client.entities.StudioVideo.filter({campaign_item_id:item.id},'created_date',1))[0];
-  if(!video){const s=item.content,ad=c.config.ad_every>0&&(item.sequence+1)%c.config.ad_every===0;video=await client.entities.StudioVideo.create({campaign_id:c.id,campaign_item_id:item.id,title:s.title,topic:c.config.topic,format:'campaign',language:c.config.language,tone:'За стратегією кампанії',duration:c.config.duration,instructions:`${c.config.visual_style}\nРубрика: ${item.rubric}. Серія: ${item.series}. ${ad?`Реклама ${c.config.ad_seconds} с, ${c.config.ad_position}: ${c.config.ad_text}`:'Без реклами.'}`.slice(0,3000),script:s.script,hook:s.hook,ending:s.ending,scenes:s.scenes,captions:s.captions,voice:c.config.voice,ad_enabled:ad,ad_text:c.config.ad_text,approved:false,status:'script_ready',credit_limit:c.config.video_limit});}
+  if(!video){const s=item.content,ad=c.config.ad_every>0&&(item.sequence+1)%c.config.ad_every===0;video=await client.entities.StudioVideo.create({campaign_id:c.id,campaign_item_id:item.id,title:s.title,topic:c.config.topic,format:'daily',language:c.config.language,tone:'За стратегією кампанії',duration:c.config.duration,instructions:`${c.config.visual_style}\nРубрика: ${item.rubric}. Серія: ${item.series}. ${ad?`Реклама ${c.config.ad_seconds} с, ${c.config.ad_position}: ${c.config.ad_text}`:'Без реклами.'}`.slice(0,3000),script:s.script,hook:s.hook,ending:s.ending,scenes:s.scenes,captions:s.captions,voice:c.config.voice,ad_enabled:ad,ad_text:c.config.ad_text,approved:false,status:'script_ready',credit_limit:c.config.video_limit});}
   await client.entities.CampaignItem.update(item.id,{video_id:video.id,message:'Передано знімок сценарію до майстерні; наступні зміни виконуйте там.'});return {videoId:video.id};
  }
  if(item.video_id)throw new Error('Ролик передано до майстерні. Змінюйте його там, щоб не розійшлися версії.');

@@ -1,0 +1,16 @@
+import React,{useRef,useEffect} from 'react';
+import {Link,useSearchParams} from 'react-router-dom';
+import useCampaignData from '@/components/campaigns/useCampaignData';
+import CampaignControls from '@/components/campaigns/CampaignControls';
+import CampaignStrategy from '@/components/campaigns/CampaignStrategy';
+import CampaignEstimate from '@/components/campaigns/CampaignEstimate';
+import CampaignCalendar from '@/components/campaigns/CampaignCalendar';
+import CampaignItemEditor from '@/components/campaigns/CampaignItemEditor';
+export default function CampaignWorkspace({id}){
+ const {data,isLoading,error,busy,action,refetch}=useCampaignData(id);const [params,setParams]=useSearchParams();const selected=params.get('item');const editor=useRef(null);
+ useEffect(()=>{if(selected&&data)editor.current?.scrollIntoView({block:'start'});},[selected,!!data]);
+ if(isLoading)return <p className="panel p-8 text-sm">Завантаження кампанії…</p>;
+ if(!data?.campaign)return <div className="panel p-6 space-y-3"><p role="alert">{error||'Кампанію не знайдено.'}</p><button className="studio-button" onClick={()=>refetch()}>Повторити</button></div>;
+ const {campaign,items,steps,usage}=data;const item=items.find(i=>i.id===selected);
+ return <div className="space-y-5"><div className="flex flex-wrap justify-between gap-3"><Link to="/campaigns" className="studio-button">Усі кампанії</Link><Link to="/calendar" className="studio-button">Загальний календар</Link></div><h1 className="text-2xl font-semibold break-words">{campaign.name}</h1><CampaignEstimate config={campaign.config}/>{error&&<p role="alert" className="rounded-lg bg-destructive/10 border border-destructive/30 p-4 text-sm text-destructive">{error}</p>}<CampaignControls campaign={campaign} steps={steps} usage={usage} busy={busy} action={action}/><CampaignStrategy strategy={campaign.strategy}/><CampaignCalendar campaign={campaign} items={items} busy={busy||!!campaign.worker_token} action={action} onSelect={itemId=>setParams({id,item:itemId})}/><div ref={editor} className="scroll-mt-24">{item&&<CampaignItemEditor key={`${item.id}-${item.revision}`} item={item} campaign={campaign} busy={busy||!!campaign.worker_token} action={action} onClose={()=>setParams({id})}/>}</div><aside className="panel p-5 text-xs text-muted-foreground space-y-3"><h2 className="font-semibold text-foreground text-sm">Межі цього етапу</h2><p>Зараз доступні стратегія, сценарії, календар, правки й передача окремого готового сценарію до наявної майстерні. Поточний монтаж майстерні використовує одне зображення; багатосценний монтаж і точні рекламні вставки ще потребують розширення.</p><p>Наступний етап: режими перегляду й автопілота, запас відео на 3 дні, автоматичні озвучка/візуали/монтаж/черга, політика пропущених слотів без масового надсилання, бюджет зовнішнього виробництва та щотижневі рекомендації з реальною або введеною статистикою.</p><p>Для планування потрібні доступна генерація Base44 та ліміти студії. Для подальших відео й публікацій — робочий Creatomate, доступний із хмари HTTPS Postiz і підключені соціальні акаунти; наявність збережених ключів не підтверджує справність підключень.</p></aside></div>;
+}

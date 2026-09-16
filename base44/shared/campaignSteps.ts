@@ -8,7 +8,7 @@ export async function seedCampaign(client,c){
   const percentile=(sequence*37)%100;let accumulated=0;const format=c.strategy.formats.find(f=>{accumulated+=f.share;return percentile<accumulated;})||c.strategy.formats[0];
   batch.push({campaign_id:c.id,sequence,scheduled_local:local,scheduled_at:localInstant(local,c.config.timezone),rubric:c.strategy.pillars[sequence%c.strategy.pillars.length].name,series:c.strategy.series[Math.floor(sequence/c.config.per_day)%c.strategy.series.length].name,format:format.name,state:'pending',manual_edit:false,revision:0});
  }
- if(batch.length)await client.entities.CampaignItem.bulkCreate(batch);return batch.length;
+ if(batch.length){await client.entities.CampaignItem.bulkCreate(batch);await client.entities.ContentCampaign.update(c.id,{message:`Календар: ${rows.length+batch.length} із ${c.total_count} відеопланів. Далі — сценарії.`});}return batch.length;
 }
 export async function applyCampaignStep(client,c,step){
  if(step.kind==='strategy'){const strategy=validateStrategy(step.result);if(!c.strategy?.summary)await client.entities.ContentCampaign.update(c.id,{strategy});}
