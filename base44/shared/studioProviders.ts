@@ -32,5 +32,5 @@ export async function takeStudioLock(client) {
   const token = crypto.randomUUID();
   await client.entities.StudioSettings.updateMany({id:settings.id,operation_lock:''},{$set:{operation_lock:token,lock_started_at:new Date().toISOString()}});
   if ((await client.entities.StudioSettings.get(settings.id)).operation_lock !== token) throw new Error('Інша операція вже виконується.');
-  return {settings,release:()=>client.entities.StudioSettings.updateMany({id:settings.id,operation_lock:token},{$set:{operation_lock:''}})};
+  return {settings,token,release:()=>client.entities.StudioSettings.updateMany({id:settings.id,operation_lock:token},{$set:{operation_lock:''}})};
 }

@@ -1,0 +1,11 @@
+import React from 'react';
+export default function CampaignFields({value,onChange,disabled}){
+ const set=(key,v)=>onChange({...value,[key]:v});
+ return <fieldset disabled={disabled} className="grid sm:grid-cols-2 gap-4">
+  {[['topic','Тема'],['goal','Мета'],['audience','Аудиторія'],['visual_style','Візуальний стиль']].map(([key,label])=><label key={key} className="studio-field">{label}<input required maxLength={key==='visual_style'?800:500} className="studio-input" value={value[key]} onChange={e=>set(key,e.target.value)}/></label>)}
+  <label className="studio-field">Мова<select className="studio-input" value={value.language} onChange={e=>set('language',e.target.value)}>{[['uk','Українська'],['pl','Польська'],['en','Англійська'],['de','Німецька'],['fr','Французька'],['es','Іспанська'],['ru','Російська']].map(([id,n])=><option key={id} value={id}>{n}</option>)}</select></label>
+  <label className="studio-field">Голос<select className="studio-input" value={value.voice} onChange={e=>set('voice',e.target.value)}>{[['river','Нейтральний'],['honey','М’який'],['sunny','Позитивний'],['storm','Впевнений'],['spark','Енергійний']].map(([id,n])=><option key={id} value={id}>{n}</option>)}</select></label>
+  {[['start_date','Дата початку','date'],['timezone','Часовий пояс IANA','text'],['days','Кількість днів','number',1,60],['per_day','Унікальних відео на день','number',1,10],['duration','Тривалість ролика, с','number',10,90],['video_limit','Ліміт на подальше відео, кр.','number',1,1000]].map(([key,label,type,min,max])=><label key={key} className="studio-field">{label}<input className="studio-input" required type={type} min={min} max={max} value={value[key]} onChange={e=>set(key,type==='number'?Number(e.target.value):e.target.value)}/></label>)}
+  <label className="studio-field sm:col-span-2">Час кожного ролика через кому (у часовому поясі кампанії)<input className="studio-input" required value={value.times_text} onChange={e=>set('times_text',e.target.value)} placeholder="09:00, 12:00, 15:00, 18:00, 21:00"/><span className="text-xs text-muted-foreground">Вкажіть {value.per_day} різних значень. Це ваш розклад, а не прогноз «найкращого часу». При неоднозначному осінньому часі використовується перший.</span></label>
+ </fieldset>;
+}

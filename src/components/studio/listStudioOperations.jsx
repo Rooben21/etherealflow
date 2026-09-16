@@ -1,0 +1,2 @@
+import {base44} from '@/api/base44Client';
+export default async function listStudioOperations(month){let rows=[],page;do{page=await base44.entities.StudioOperation.filter({created_date:{$gte:month}},'-created_date',100,rows.length);rows.push(...page);}while(page.length===100);return rows;}

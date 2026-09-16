@@ -2,6 +2,12 @@
   "name": "StudioVideo",
   "type": "object",
   "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "campaign_item_id": {
+      "type": "string"
+    },
     "title": {
       "type": "string"
     },
@@ -48,6 +54,9 @@
     "hook": {
       "type": "string"
     },
+    "ending": {
+      "type": "string"
+    },
     "scenes": {
       "type": "array",
       "items": {
@@ -61,6 +70,12 @@
           },
           "seconds": {
             "type": "number"
+          },
+          "screen_text": {
+            "type": "string"
+          },
+          "is_ad": {
+            "type": "boolean"
           }
         }
       }

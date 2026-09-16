@@ -1,35 +1,43 @@
 {
-  "name": "StudioOperation",
+  "name": "ContentCampaign",
   "type": "object",
   "properties": {
-    "video_id": {
+    "name": {
       "type": "string"
     },
-    "campaign_id": {
-      "type": "string"
+    "config": {
+      "type": "object"
     },
-    "stage": {
-      "type": "string"
+    "strategy": {
+      "type": "object"
     },
     "status": {
-      "type": "string"
+      "type": "string",
+      "default": "draft"
     },
-    "credits_estimate": {
+    "total_count": {
       "type": "number"
     },
-    "cost_type": {
+    "ready_count": {
+      "type": "number",
+      "default": 0
+    },
+    "worker_token": {
       "type": "string",
-      "default": "estimate"
+      "default": ""
+    },
+    "worker_started_at": {
+      "type": "string"
     },
     "message": {
       "type": "string"
     }
   },
   "required": [
-    "video_id",
-    "stage",
+    "name",
+    "config",
     "status",
-    "credits_estimate"
+    "total_count"
   ],
   "rls": {
     "read": {

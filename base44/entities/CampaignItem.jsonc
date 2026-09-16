@@ -1,0 +1,80 @@
+{
+  "name": "CampaignItem",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "number"
+    },
+    "scheduled_at": {
+      "type": "string"
+    },
+    "scheduled_local": {
+      "type": "string"
+    },
+    "rubric": {
+      "type": "string"
+    },
+    "series": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string",
+      "default": "pending"
+    },
+    "content": {
+      "type": "object"
+    },
+    "previous_content": {
+      "type": "object"
+    },
+    "manual_edit": {
+      "type": "boolean",
+      "default": false
+    },
+    "revision": {
+      "type": "number",
+      "default": 0
+    },
+    "video_id": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "campaign_id",
+    "sequence",
+    "scheduled_at",
+    "scheduled_local",
+    "state"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

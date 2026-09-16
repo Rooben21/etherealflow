@@ -1,0 +1,5 @@
+import React from 'react';
+import {Link} from 'react-router-dom';
+export default function CampaignCalendarEntry({item}){
+ return <article className="rounded-lg border border-border p-3 space-y-2"><p className="text-xs text-primary">Відеоплан кампанії · {new Date(item.scheduled_at).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})}</p><h3 className="text-sm font-semibold">{item.title_snapshot}</h3><p className="text-xs text-muted-foreground">{item.rubric} · {item.video_id?'Передано до майстерні':item.state==='ready'?'Сценарій готовий':'Очікує сценарію'}{item.manual_edit?' · Ручні правки':''}</p><Link className="studio-button" to={`/campaigns?id=${item.campaign_id}&item=${item.id}`}>Відкрити кампанію та сценарій</Link><p className="text-xs text-muted-foreground">Це план ролика, не запис у черзі Postiz.</p></article>;
+}

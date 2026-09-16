@@ -1,0 +1,5 @@
+import React from 'react';
+export default function CampaignEstimate({config}){
+ const count=config.days*config.per_day,accounts=config.account_ids?.length||0,calls=1+Math.ceil(count/2);
+ return <div className="rounded-xl border border-border bg-accent p-4 space-y-2 text-sm"><p><strong>{count} унікальних відео</strong> · {count*accounts} потенційних публікацій у {accounts} акаунтах.</p><p>Поточний режим: <strong>лише план і сценарії</strong>. Один ролик можна використати в кількох акаунтах; це не створює новий унікальний ролик.</p><p>Base44: 1 стратегія + приблизно {Math.ceil(count/2)} порцій сценаріїв, орієнтир ≈ {calls} кредитів за внутрішньою оцінкою 1 кр./виклик. Перегенерації рахуються окремо; це не точний тариф і не жорсткий ліміт фактичного списання.</p><p className="text-xs text-muted-foreground">Creatomate та Postiz у цьому режимі не запускаються. Вартість майбутнього виробництва сюди не включено; зовнішні тарифи не перевірені. Автопілот і автоматична адаптація стратегії ще не реалізовані.</p></div>;
+}

@@ -1,35 +1,42 @@
 {
-  "name": "StudioOperation",
+  "name": "CampaignStep",
   "type": "object",
   "properties": {
-    "video_id": {
-      "type": "string"
-    },
     "campaign_id": {
       "type": "string"
     },
-    "stage": {
+    "kind": {
       "type": "string"
     },
-    "status": {
+    "item_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "state": {
       "type": "string"
     },
-    "credits_estimate": {
-      "type": "number"
+    "result": {
+      "type": "object"
     },
-    "cost_type": {
-      "type": "string",
-      "default": "estimate"
+    "operation_id": {
+      "type": "string"
+    },
+    "studio_lock_token": {
+      "type": "string"
+    },
+    "studio_settings_id": {
+      "type": "string"
     },
     "message": {
       "type": "string"
     }
   },
   "required": [
-    "video_id",
-    "stage",
-    "status",
-    "credits_estimate"
+    "campaign_id",
+    "kind",
+    "state"
   ],
   "rls": {
     "read": {

@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
 import { takeStudioLock } from '../../shared/studioProviders.ts';
+import { operationUsage } from '../../shared/studioOperationUsage.ts';
 export default async function(req) {
   let client, settings, job, operation, lock, locked = false;
   try {
@@ -20,14 +21,8 @@ export default async function(req) {
     locked = true;
     if (settings.generation_paused) throw new Error('Генерацію призупинено. Відновіть її на дашборді.');
     const estimate = stage === 'audio' ? Math.ceil(job.script.length/50) : 1;
-    const now = new Date();
-    const monthStart = new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),1)).toISOString();
-    const dayStart = now.toISOString().slice(0,10);
-    const entries = await client.entities.StudioOperation.filter({created_date:{$gte:monthStart}},'-created_date',500);
-    const videoEntries = await client.entities.StudioOperation.filter({video_id:job.id},'-created_date',500);
-    const sum = rows => rows.reduce((s,r)=>s+(r.credits_estimate||0),0);
-    if(entries.length >= 500 || videoEntries.length >= 500) throw new Error('Досягнуто межу обліку операцій. Нові платні дії зупинено.');
-    if(sum(entries)+estimate > settings.monthly_credit_limit || sum(entries.filter(r=>r.created_date.slice(0,10)===dayStart))+estimate > settings.daily_credit_limit || sum(videoEntries)+estimate > job.credit_limit) throw new Error('Недостатній ліміт кредитів. Перевірте бюджет у налаштуваннях та ліміт цього відео.');
+    const usage = await operationUsage(client,{videoId:job.id});
+    if(usage.month+estimate > settings.monthly_credit_limit || usage.day+estimate > settings.daily_credit_limit || usage.video+estimate > job.credit_limit) throw new Error('Недостатній ліміт кредитів. Перевірте бюджет у налаштуваннях та ліміт цього відео.');
     operation = await client.entities.StudioOperation.create({video_id:job.id,stage,status:'running',credits_estimate:estimate,cost_type:'estimate',message:'Зарезервовано до отримання результату; фактичне списання звіряйте у Base44.'});
     await client.entities.StudioVideo.update(job.id,{status:'running',last_error:''});
     let patch = {};
