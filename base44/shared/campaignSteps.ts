@@ -1,6 +1,6 @@
 import {allCampaignItems} from './campaignLock.ts';
 import {campaignDate,localInstant} from './campaignConfig.ts';
-import {validateStrategy,validateContent,duplicateContent} from './campaignAI.ts';
+import {validateStrategy,validateContent,duplicateContent,alignNarrationMetadata} from './campaignAI.ts';
 export async function seedCampaign(client,c){
  const rows=await allCampaignItems(client,c.id),existing=new Set(rows.map(r=>r.sequence)),batch=[];
  for(let sequence=0;sequence<c.total_count&&batch.length<100;sequence++){if(existing.has(sequence))continue;
@@ -17,8 +17,9 @@ export async function applyCampaignStep(client,c,step){
   if(!Array.isArray(values)||values.length!==step.item_ids.length||new Set(values.map(v=>v.item_id)).size!==values.length||values.some(v=>!step.item_ids.includes(v.item_id)))throw new Error('ШІ повернув не всі потрібні сценарії; результат збережено.');
   const changes=[];
   for(const value of values){const item=all.find(i=>i.id===value.item_id);if(!item)throw new Error('Ролик не знайдено.');if(item.state!=='pending'||item.manual_edit||item.video_id)continue;
-   const content=validateContent(value,c.config,item.sequence,true);if(duplicateContent(content,all,item.id))throw new Error('Виявлено повтор назви або вступу; інші сценарії не змінено.');
-   item.content=content;changes.push({id:item.id,content,state:'ready',message:'Сценарій збережено; виробництво ще не запускалося.',revision:(item.revision||0)+1});
+   const aligned=alignNarrationMetadata(value),content=validateContent(aligned,c.config,item.sequence,true);if(duplicateContent(content,all,item.id))throw new Error('Виявлено повтор назви або вступу; інші сценарії не змінено.');
+   const adjusted=aligned.hook!==value.hook||aligned.ending!==value.ending;
+   item.content=content;changes.push({id:item.id,content,state:'ready',message:adjusted?'Сценарій збережено. Поля початку й завершення узгоджено з наявною озвучкою без нового запиту ШІ; сцени не змінено.':'Сценарій збережено; виробництво ще не запускалося.',revision:(item.revision||0)+1});
   }
   if(changes.length){await client.entities.CampaignItem.bulkUpdate(changes);for(const change of changes){const stored=await client.entities.CampaignItem.get(change.id);if(stored.state!=='ready'||stored.content?.script!==change.content.script)throw new Error('Не всі результати збережено. Відновіть крок із записаної відповіді без повторної генерації.');}}
  }
